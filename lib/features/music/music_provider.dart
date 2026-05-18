@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/network/network_service.dart';
 import '../../models/track_model.dart';
 
 // --- ALL PROVIDERS MUST BE AT THE TOP LEVEL ---
@@ -35,18 +36,22 @@ final playlistProvider = FutureProvider.family<List<Track>, String>((
   final prefs = await SharedPreferences.getInstance();
   await prefs.setString('last_emotion', emotion);
 
-  // Consume Deezer API based on the emotion
   final dio = Dio(
     BaseOptions(
-      connectTimeout: const Duration(seconds: 10), // Handling timeouts!
+      connectTimeout: NetworkService.defaultTimeout,
+      sendTimeout: NetworkService.defaultTimeout,
+      receiveTimeout: NetworkService.defaultTimeout,
     ),
   );
 
-  final response = await dio.get(
-    'https://api.deezer.com/search?q=${emotion.toLowerCase()} music',
-  );
+  try {
+    final response = await dio.get(
+      'https://api.deezer.com/search?q=${emotion.toLowerCase()} music',
+    );
 
-  // Parse the JSON list into our Dart objects
-  final List data = response.data['data'];
-  return data.map((json) => Track.fromJson(json)).toList();
+    final List data = response.data['data'];
+    return data.map((json) => Track.fromJson(json)).toList();
+  } catch (e) {
+    throw NetworkService.from(e);
+  }
 });

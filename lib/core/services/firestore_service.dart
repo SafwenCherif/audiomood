@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../models/mood_history_model.dart';
+import '../network/network_service.dart';
 
 class FirestoreService {
   FirestoreService({FirebaseFirestore? firestore})
@@ -15,9 +18,25 @@ class FirestoreService {
   }
 
   Future<void> addHistory(MoodHistoryModel history) async {
-    await _historyCollection(
-      history.userId,
-    ).doc(history.id).set(history.toJson());
+    try {
+      await _historyCollection(history.userId)
+          .doc(history.id)
+          .set(history.toJson())
+          .timeout(NetworkService.defaultTimeout);
+    } catch (e) {
+      throw NetworkService.from(e);
+    }
+  }
+
+  Future<void> deleteHistory(String userId, String historyId) async {
+    try {
+      await _historyCollection(userId)
+          .doc(historyId)
+          .delete()
+          .timeout(NetworkService.defaultTimeout);
+    } catch (e) {
+      throw NetworkService.from(e);
+    }
   }
 
   Stream<List<MoodHistoryModel>> streamHistory(String userId) {

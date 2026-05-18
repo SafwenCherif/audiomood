@@ -1,8 +1,18 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '../network/network_service.dart';
 
 class CloudinaryService {
-  CloudinaryService({Dio? dio}) : _dio = dio ?? Dio();
+  CloudinaryService({Dio? dio})
+    : _dio =
+          dio ??
+          Dio(
+            BaseOptions(
+              connectTimeout: NetworkService.defaultTimeout,
+              sendTimeout: NetworkService.defaultTimeout,
+              receiveTimeout: NetworkService.defaultTimeout,
+            ),
+          );
 
   final Dio _dio;
 
@@ -20,12 +30,15 @@ class CloudinaryService {
       'upload_preset': uploadPreset,
     });
 
-    final response = await _dio.post(url, data: formData);
-    if (response.statusCode == 200) {
-      final data = response.data as Map<String, dynamic>;
-      return data['secure_url'] as String? ?? '';
+    try {
+      final response = await _dio.post(url, data: formData);
+      if (response.statusCode == 200) {
+        final data = response.data as Map<String, dynamic>;
+        return data['secure_url'] as String? ?? '';
+      }
+      throw Exception('Cloudinary upload failed');
+    } catch (e) {
+      throw NetworkService.from(e);
     }
-
-    throw Exception('Cloudinary upload failed');
   }
 }
