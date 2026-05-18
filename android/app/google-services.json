@@ -1,0 +1,90 @@
+{
+  "project_info": {
+    "project_number": "811278434716",
+    "project_id": "audiomood-abb34",
+    "storage_bucket": "audiomood-abb34.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811278434716:android:8bff8169e4a4bdf4bfc859",
+        "android_client_info": {
+          "package_name": "com.audiomood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811278434716-spstrfgv08qs30c20ck5qblecg01opat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ7dJ-qoDV-2YVm0GZ384w2BUsZU0BaR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "811278434716-spstrfgv08qs30c20ck5qblecg01opat.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "811278434716-dplop5tfdv8p2t5e2jb85cbgsfevj509.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.audiomood"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:811278434716:android:abf0dfb1a86e7cdbbfc859",
+        "android_client_info": {
+          "package_name": "com.example.audiomood"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "811278434716-dvqrnpeetearlq7c8g23v6p2e2dv08u1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.audiomood",
+            "certificate_hash": "1be5d43219efc4d296a1b648e8e5ad9438d7fd0c"
+          }
+        },
+        {
+          "client_id": "811278434716-spstrfgv08qs30c20ck5qblecg01opat.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBJ7dJ-qoDV-2YVm0GZ384w2BUsZU0BaR8"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "811278434716-spstrfgv08qs30c20ck5qblecg01opat.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "811278434716-dplop5tfdv8p2t5e2jb85cbgsfevj509.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.audiomood"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
