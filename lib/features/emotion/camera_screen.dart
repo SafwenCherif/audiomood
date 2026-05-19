@@ -16,8 +16,11 @@ import '../history/history_provider.dart';
 import '../../models/mood_history_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../history/history_screen.dart';
+import '../../core/locale/locale_provider.dart';
 import '../../core/network/network_service.dart';
 import '../../core/network/network_provider.dart';
+import '../../l10n/app_localizations.dart';
+import '../../widgets/language_switcher.dart';
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});
@@ -77,14 +80,18 @@ class _CameraScreenState extends State<CameraScreen> {
     }
   }
 
-  void _showNetworkSnackBar(BuildContext context, NetworkException error) {
+  void _showNetworkSnackBar(
+    BuildContext context,
+    NetworkException error,
+    AppLocalizations l10n,
+  ) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text(error.message),
         backgroundColor: Colors.red.shade700,
         duration: const Duration(seconds: 5),
         action: SnackBarAction(
-          label: 'OK',
+          label: l10n.ok,
           textColor: Colors.white,
           onPressed: () {},
         ),
@@ -99,16 +106,18 @@ class _CameraScreenState extends State<CameraScreen> {
     ref.read(isLoadingProvider.notifier).state = true;
     final method = ref.read(emotionMethodProvider);
     final user = FirebaseAuth.instance.currentUser;
+    final locale = ref.read(localeProvider);
+    final l10n = AppLocalizations.of(context)!;
     final networkService = ref.read(networkServiceProvider);
     final cloudinaryService = ref.read(cloudinaryServiceProvider);
     final firestoreService = ref.read(firestoreServiceProvider);
 
     try {
       if (user == null) {
-        throw Exception('Please sign in to save your mood history.');
+        throw Exception(l10n.signInToSaveHistory);
       }
 
-      await networkService.ensureConnected();
+      await networkService.ensureConnected(locale: locale);
 
       final imageUrl = await cloudinaryService
           .uploadImage(imagePath)
@@ -138,7 +147,7 @@ class _CameraScreenState extends State<CameraScreen> {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Emotion detected: $emotion! 🎵'),
+            content: Text(l10n.emotionDetected(emotion)),
             backgroundColor: Colors.green,
           ),
         );
@@ -151,8 +160,8 @@ class _CameraScreenState extends State<CameraScreen> {
       }
     } catch (e) {
       if (!context.mounted) return;
-      final networkError = NetworkService.from(e);
-      _showNetworkSnackBar(context, networkError);
+      final networkError = NetworkService.from(e, locale: locale);
+      _showNetworkSnackBar(context, networkError, l10n);
     } finally {
       ref.read(isLoadingProvider.notifier).state = false;
     }
@@ -185,14 +194,15 @@ class _CameraScreenState extends State<CameraScreen> {
         final isLoading = ref.watch(isLoadingProvider);
         final lastEmotionAsync = ref.watch(lastEmotionProvider);
         final selectedMethod = ref.watch(emotionMethodProvider);
+        final l10n = AppLocalizations.of(context)!;
         final user = FirebaseAuth.instance.currentUser;
-        final displayName = user?.displayName ?? 'AudioMood User';
+        final displayName = user?.displayName ?? l10n.defaultUserName;
         final email = user?.email ?? '';
         final photoUrl = user?.photoURL;
 
         return Scaffold(
           appBar: AppBar(
-            title: const Text('Capture Emotion'),
+            title: Text(l10n.captureEmotion),
             actions: [
               IconButton(
                 icon: const Icon(Icons.logout),
@@ -218,9 +228,10 @@ class _CameraScreenState extends State<CameraScreen> {
                   ),
                   decoration: const BoxDecoration(color: Colors.deepPurple),
                 ),
+                const LanguageSwitcher(),
                 ListTile(
                   leading: const Icon(Icons.history),
-                  title: const Text('Show history'),
+                  title: Text(l10n.showHistory),
                   onTap: () {
                     Navigator.pop(context);
                     Navigator.push(
@@ -238,7 +249,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       await ref.read(authControllerProvider.notifier).signOut();
                     },
                     icon: const Icon(Icons.logout),
-                    label: const Text('Sign out'),
+                    label: Text(l10n.signOut),
                     style: ElevatedButton.styleFrom(
                       minimumSize: const Size.fromHeight(48),
                       backgroundColor: Colors.deepPurple,
@@ -267,12 +278,12 @@ class _CameraScreenState extends State<CameraScreen> {
                           borderRadius: BorderRadius.circular(14),
                           child: Image.file(File(imagePath), fit: BoxFit.cover),
                         )
-                      : const Column(
+                      : Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Icon(Icons.face, size: 80, color: Colors.grey),
-                            SizedBox(height: 10),
-                            Text("No face captured yet"),
+                            const Icon(Icons.face, size: 80, color: Colors.grey),
+                            const SizedBox(height: 10),
+                            Text(l10n.noFaceCaptured),
                           ],
                         ),
                 ),
@@ -290,9 +301,9 @@ class _CameraScreenState extends State<CameraScreen> {
                   ),
                   child: Column(
                     children: [
-                      const Text(
-                        'Detection method',
-                        style: TextStyle(fontWeight: FontWeight.w600),
+                      Text(
+                        l10n.detectionMethod,
+                        style: const TextStyle(fontWeight: FontWeight.w600),
                       ),
                       const SizedBox(height: 8),
                       Wrap(
@@ -301,7 +312,7 @@ class _CameraScreenState extends State<CameraScreen> {
                         runSpacing: 8,
                         children: [
                           ChoiceChip(
-                            label: const Text('Groq Vision'),
+                            label: Text(l10n.groqVision),
                             selected:
                                 selectedMethod == EmotionDetectionMethod.groq,
                             onSelected: isLoading
@@ -318,7 +329,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                   },
                           ),
                           ChoiceChip(
-                            label: const Text('Local TFLite'),
+                            label: Text(l10n.localTflite),
                             selected:
                                 selectedMethod == EmotionDetectionMethod.tflite,
                             onSelected: isLoading
@@ -336,7 +347,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                   },
                           ),
                           ChoiceChip(
-                            label: const Text('ML Kit'),
+                            label: Text(l10n.mlKit),
                             selected:
                                 selectedMethod == EmotionDetectionMethod.mlkit,
                             onSelected: isLoading
@@ -365,7 +376,7 @@ class _CameraScreenState extends State<CameraScreen> {
                       : Column(
                           children: [
                             Text(
-                              'Last mood: $lastEmotion',
+                              l10n.lastMood(lastEmotion),
                               style: const TextStyle(
                                 fontWeight: FontWeight.w600,
                               ),
@@ -385,7 +396,7 @@ class _CameraScreenState extends State<CameraScreen> {
                                       );
                                     },
                               icon: const Icon(Icons.history),
-                              label: const Text('Use last mood'),
+                              label: Text(l10n.useLastMood),
                             ),
                           ],
                         ),
@@ -398,7 +409,7 @@ class _CameraScreenState extends State<CameraScreen> {
                     ElevatedButton.icon(
                       onPressed: isLoading ? null : () => _pickImage(ref),
                       icon: const Icon(Icons.camera_alt),
-                      label: const Text('Take Photo'),
+                      label: Text(l10n.takePhoto),
                     ),
                     const SizedBox(width: 20),
                     if (imagePath != null)
@@ -421,7 +432,7 @@ class _CameraScreenState extends State<CameraScreen> {
                               )
                             : const Icon(Icons.auto_awesome),
                         label: Text(
-                          isLoading ? 'Analyzing...' : 'Find Playlist',
+                          isLoading ? l10n.analyzing : l10n.findPlaylist,
                         ),
                       ),
                   ],

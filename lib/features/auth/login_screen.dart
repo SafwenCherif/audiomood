@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/app_localizations.dart';
+import '../../widgets/language_switcher.dart';
 import 'auth_provider.dart';
 import 'register_screen.dart';
 
@@ -52,12 +54,14 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer(
       builder: (context, ref, _) {
         final isLoading = ref.watch(authControllerProvider).isLoading;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Sign in')),
+          appBar: AppBar(title: Text(l10n.signIn)),
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -65,18 +69,20 @@ class _LoginScreenState extends State<LoginScreen> {
                 constraints: const BoxConstraints(maxWidth: 420),
                 child: Column(
                   children: [
+                    const LanguageSwitcher(compact: true),
+                    const SizedBox(height: 16),
                     const Icon(Icons.lock_outline, size: 72),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Welcome back',
-                      style: TextStyle(
+                    Text(
+                      l10n.welcomeBack,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Sign in to continue your music journey.',
+                    Text(
+                      l10n.signInSubtitle,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
@@ -87,17 +93,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: Icon(Icons.email),
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.email,
+                              prefixIcon: const Icon(Icons.email),
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Email is required';
+                                return l10n.emailRequired;
                               }
                               if (!value.contains('@')) {
-                                return 'Enter a valid email';
+                                return l10n.emailInvalid;
                               }
                               return null;
                             },
@@ -106,17 +112,17 @@ class _LoginScreenState extends State<LoginScreen> {
                           TextFormField(
                             controller: _passwordController,
                             obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock),
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.password,
+                              prefixIcon: const Icon(Icons.lock),
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Password is required';
+                                return l10n.passwordRequired;
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
+                                return l10n.passwordMinLength;
                               }
                               return null;
                             },
@@ -129,7 +135,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             child: isLoading
                                 ? const CircularProgressIndicator()
-                                : const Text('Sign in'),
+                                : Text(l10n.signIn),
                           ),
                           const SizedBox(height: 12),
                           OutlinedButton.icon(
@@ -137,7 +143,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? null
                                 : () => _loginWithGoogle(ref),
                             icon: const Icon(Icons.g_mobiledata),
-                            label: const Text('Sign in with Google'),
+                            label: Text(l10n.signInWithGoogle),
                             style: OutlinedButton.styleFrom(
                               minimumSize: const Size.fromHeight(48),
                             ),
@@ -157,7 +163,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ),
                               );
                             },
-                      child: const Text("Don't have an account? Sign up"),
+                      child: Text(l10n.noAccountSignUp),
                     ),
                   ],
                 ),

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../core/network/network_service.dart';
+import '../l10n/app_localizations.dart';
 
 class NetworkErrorView extends StatelessWidget {
   const NetworkErrorView({
@@ -26,21 +27,23 @@ class NetworkErrorView extends StatelessWidget {
     }
   }
 
-  String get _title {
+  String _title(AppLocalizations l10n) {
     switch (failureType) {
       case NetworkFailureType.offline:
-        return 'No internet connection';
+        return l10n.errorTitleOffline;
       case NetworkFailureType.timeout:
-        return 'Request timed out';
+        return l10n.errorTitleTimeout;
       case NetworkFailureType.server:
-        return 'Server error';
+        return l10n.errorTitleServer;
       case NetworkFailureType.unknown:
-        return 'Something went wrong';
+        return l10n.errorTitleUnknown;
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24),
@@ -50,7 +53,7 @@ class NetworkErrorView extends StatelessWidget {
             Icon(_icon, size: 72, color: Colors.deepPurple.shade300),
             const SizedBox(height: 16),
             Text(
-              _title,
+              _title(l10n),
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
@@ -65,7 +68,7 @@ class NetworkErrorView extends StatelessWidget {
               ElevatedButton.icon(
                 onPressed: onRetry,
                 icon: const Icon(Icons.refresh),
-                label: const Text('Try again'),
+                label: Text(l10n.tryAgain),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.deepPurple,
                   foregroundColor: Colors.white,

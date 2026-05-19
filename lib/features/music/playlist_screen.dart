@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/app_localizations.dart';
 import 'music_provider.dart';
 import '../../widgets/track_card.dart';
 
@@ -10,29 +11,31 @@ class PlaylistScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer(
       builder: (context, ref, _) {
         final playlistAsyncValue = ref.watch(playlistProvider(emotion));
 
         return Scaffold(
           appBar: AppBar(
-            title: Text('$emotion Playlist 🎵'),
+            title: Text(l10n.playlistTitle(emotion)),
             backgroundColor: Colors.deepPurple,
             foregroundColor: Colors.white,
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context),
-              tooltip: 'Go back',
+              tooltip: l10n.goBack,
             ),
           ),
           body: playlistAsyncValue.when(
-            loading: () => const Center(
+            loading: () => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  CircularProgressIndicator(),
-                  SizedBox(height: 16),
-                  Text("Fetching vibes from Deezer..."),
+                  const CircularProgressIndicator(),
+                  const SizedBox(height: 16),
+                  Text(l10n.fetchingFromDeezer),
                 ],
               ),
             ),
@@ -40,7 +43,7 @@ class PlaylistScreen extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.all(16.0),
                 child: Text(
-                  "Oops! Couldn't load music.\nCheck your internet connection.",
+                  l10n.playlistLoadError,
                   textAlign: TextAlign.center,
                   style: const TextStyle(color: Colors.red, fontSize: 16),
                 ),
@@ -48,9 +51,7 @@ class PlaylistScreen extends StatelessWidget {
             ),
             data: (tracks) {
               if (tracks.isEmpty) {
-                return const Center(
-                  child: Text("No tracks found for this mood."),
-                );
+                return Center(child: Text(l10n.noTracksForMood));
               }
               return ListView.builder(
                 itemCount: tracks.length,
@@ -66,11 +67,7 @@ class PlaylistScreen extends StatelessWidget {
                     onTap: () async {
                       if (track.previewUrl.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "No audio preview available for this track.",
-                            ),
-                          ),
+                          SnackBar(content: Text(l10n.noPreviewAvailable)),
                         );
                         return;
                       }

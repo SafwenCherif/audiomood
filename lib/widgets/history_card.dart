@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../l10n/app_localizations.dart';
 import '../models/mood_history_model.dart';
 
 class HistoryCard extends StatelessWidget {
@@ -9,6 +10,7 @@ class HistoryCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final date = history.createdAt.toDate();
     final formatted =
         '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
@@ -32,7 +34,7 @@ class HistoryCard extends StatelessWidget {
           history.mood.toUpperCase(),
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
-        subtitle: Text('Saved on $formatted'),
+        subtitle: Text(l10n.savedOn(formatted)),
         trailing: const Icon(Icons.chevron_right),
       ),
     );

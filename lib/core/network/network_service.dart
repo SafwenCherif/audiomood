@@ -3,6 +3,9 @@ import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/material.dart';
+
+import '../../l10n/app_localizations.dart';
 
 enum NetworkFailureType { offline, timeout, server, unknown }
 
@@ -29,17 +32,23 @@ class NetworkService {
     return result != ConnectivityResult.none;
   }
 
-  Future<void> ensureConnected() async {
+  Future<void> ensureConnected({Locale locale = const Locale('fr')}) async {
     if (!await hasInternetConnection()) {
       throw NetworkException(
         NetworkFailureType.offline,
-        'No internet connection. Please turn on Wi‑Fi or mobile data and try again.',
+        _messages(locale).errorNoInternet,
       );
     }
   }
 
-  static NetworkException from(Object error) {
+  static AppLocalizations _messages(Locale locale) {
+    return lookupAppLocalizations(locale);
+  }
+
+  static NetworkException from(Object error, {Locale locale = const Locale('fr')}) {
     if (error is NetworkException) return error;
+
+    final l10n = _messages(locale);
 
     if (error is DioException) {
       switch (error.type) {
@@ -48,17 +57,17 @@ class NetworkService {
         case DioExceptionType.receiveTimeout:
           return NetworkException(
             NetworkFailureType.timeout,
-            'The request timed out. The server took too long to respond. Please try again.',
+            l10n.errorTimeout,
           );
         case DioExceptionType.connectionError:
           return NetworkException(
             NetworkFailureType.offline,
-            'Unable to reach the server. Check your internet connection and try again.',
+            l10n.errorCannotReachServer,
           );
         default:
           return NetworkException(
             NetworkFailureType.server,
-            'A network error occurred while contacting the server. Please try again later.',
+            l10n.errorServer,
           );
       }
     }
@@ -66,7 +75,7 @@ class NetworkService {
     if (error is TimeoutException) {
       return NetworkException(
         NetworkFailureType.timeout,
-        'The operation timed out. Please check your connection and try again.',
+        l10n.errorOperationTimeout,
       );
     }
 
@@ -74,7 +83,7 @@ class NetworkService {
       if (error.code == 'unavailable') {
         return NetworkException(
           NetworkFailureType.offline,
-          'Cannot reach the database. Check your internet connection and try again.',
+          l10n.errorDatabaseUnavailable,
         );
       }
     }
@@ -87,13 +96,13 @@ class NetworkService {
         text.contains('unavailable')) {
       return NetworkException(
         NetworkFailureType.offline,
-        'No internet connection. Please check your network and try again.',
+        l10n.errorNoInternetShort,
       );
     }
 
     return NetworkException(
       NetworkFailureType.unknown,
-      'Something went wrong. Please try again.',
+      l10n.errorSomethingWrong,
     );
   }
 }

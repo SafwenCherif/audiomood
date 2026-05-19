@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import 'auth_wrapper.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -14,27 +15,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _controller = PageController();
   int _pageIndex = 0;
 
-  final List<_OnboardingPageData> _pages = const [
-    _OnboardingPageData(
-      title: 'Welcome to AudioMood',
-      subtitle:
-          'Capture a selfie and let AI detect your vibe to generate the perfect playlist.',
-      icon: Icons.face_retouching_natural,
-    ),
-    _OnboardingPageData(
-      title: 'Music that matches you',
-      subtitle:
-          'We search Deezer instantly to find tracks that fit your current mood.',
-      icon: Icons.library_music,
-    ),
-    _OnboardingPageData(
-      title: 'Save your vibe',
-      subtitle:
-          'Your last mood is saved so you can jump back in without waiting.',
-      icon: Icons.bookmark_added,
-    ),
-  ];
-
   @override
   void dispose() {
     _controller.dispose();
@@ -47,9 +27,29 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     ref.invalidate(onboardingSeenProvider);
   }
 
+  List<_OnboardingPageData> _pages(AppLocalizations l10n) => [
+    _OnboardingPageData(
+      title: l10n.onboardingTitle1,
+      subtitle: l10n.onboardingSubtitle1,
+      icon: Icons.face_retouching_natural,
+    ),
+    _OnboardingPageData(
+      title: l10n.onboardingTitle2,
+      subtitle: l10n.onboardingSubtitle2,
+      icon: Icons.library_music,
+    ),
+    _OnboardingPageData(
+      title: l10n.onboardingTitle3,
+      subtitle: l10n.onboardingSubtitle3,
+      icon: Icons.bookmark_added,
+    ),
+  ];
+
   @override
   Widget build(BuildContext context) {
-    final isLast = _pageIndex == _pages.length - 1;
+    final l10n = AppLocalizations.of(context)!;
+    final pages = _pages(l10n);
+    final isLast = _pageIndex == pages.length - 1;
 
     return Consumer(
       builder: (context, ref, _) {
@@ -70,12 +70,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Expanded(
                     child: PageView.builder(
                       controller: _controller,
-                      itemCount: _pages.length,
+                      itemCount: pages.length,
                       onPageChanged: (index) {
                         setState(() => _pageIndex = index);
                       },
                       itemBuilder: (context, index) {
-                        final page = _pages[index];
+                        final page = pages[index];
                         return Padding(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 24,
@@ -126,7 +126,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: List.generate(
-                      _pages.length,
+                      pages.length,
                       (index) => AnimatedContainer(
                         duration: const Duration(milliseconds: 250),
                         margin: const EdgeInsets.symmetric(horizontal: 6),
@@ -159,9 +159,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ),
                               ),
                               icon: const Icon(Icons.login),
-                              label: const Text(
-                                'Sign up or sign in to start',
-                                style: TextStyle(fontWeight: FontWeight.w600),
+                              label: Text(
+                                l10n.onboardingStart,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                             )
                           : OutlinedButton(
@@ -180,7 +182,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   borderRadius: BorderRadius.circular(16),
                                 ),
                               ),
-                              child: const Text('Next'),
+                              child: Text(l10n.next),
                             ),
                     ),
                   ),
@@ -188,9 +190,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   if (!isLast)
                     TextButton(
                       onPressed: () => _completeOnboarding(ref),
-                      child: const Text(
-                        'Skip',
-                        style: TextStyle(color: Colors.white70),
+                      child: Text(
+                        l10n.skip,
+                        style: const TextStyle(color: Colors.white70),
                       ),
                     ),
                   const SizedBox(height: 16),

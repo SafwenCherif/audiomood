@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:dio/dio.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../core/locale/locale_provider.dart';
 import '../../core/network/network_service.dart';
 import '../../models/track_model.dart';
 
@@ -52,6 +53,6 @@ final playlistProvider = FutureProvider.family<List<Track>, String>((
     final List data = response.data['data'];
     return data.map((json) => Track.fromJson(json)).toList();
   } catch (e) {
-    throw NetworkService.from(e);
+    throw NetworkService.from(e, locale: ref.read(localeProvider));
   }
 });

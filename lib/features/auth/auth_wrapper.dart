@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../../l10n/app_localizations.dart';
 import '../emotion/camera_screen.dart';
 import 'onboarding_screen.dart';
 import 'auth_provider.dart';
@@ -24,7 +25,6 @@ class AuthWrapper extends StatelessWidget {
         return authState.when(
           data: (user) {
             if (user != null) {
-              // If logged in, go to the main app screen
               return const CameraScreen();
             }
 
@@ -38,13 +38,22 @@ class AuthWrapper extends StatelessWidget {
               loading: () => const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
               ),
-              error: (e, trace) =>
-                  Scaffold(body: Center(child: Text("Error: $e"))),
+              error: (e, _) {
+                final l10n = AppLocalizations.of(context)!;
+                return Scaffold(
+                  body: Center(child: Text(l10n.errorGeneric(e.toString()))),
+                );
+              },
             );
           },
           loading: () =>
               const Scaffold(body: Center(child: CircularProgressIndicator())),
-          error: (e, trace) => Scaffold(body: Center(child: Text("Error: $e"))),
+          error: (e, _) {
+            final l10n = AppLocalizations.of(context)!;
+            return Scaffold(
+              body: Center(child: Text(l10n.errorGeneric(e.toString()))),
+            );
+          },
         );
       },
     );

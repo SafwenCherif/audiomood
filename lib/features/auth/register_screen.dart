@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../l10n/app_localizations.dart';
 import 'auth_provider.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -44,12 +45,14 @@ class _RegisterScreenState extends State<RegisterScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Consumer(
       builder: (context, ref, _) {
         final isLoading = ref.watch(authControllerProvider).isLoading;
 
         return Scaffold(
-          appBar: AppBar(title: const Text('Create account')),
+          appBar: AppBar(title: Text(l10n.createAccount)),
           body: Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -59,16 +62,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   children: [
                     const Icon(Icons.person_add, size: 72),
                     const SizedBox(height: 16),
-                    const Text(
-                      'Create your account',
-                      style: TextStyle(
+                    Text(
+                      l10n.createAccountTitle,
+                      style: const TextStyle(
                         fontSize: 24,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'Sign up to save your moods and playlists.',
+                    Text(
+                      l10n.createAccountSubtitle,
                       textAlign: TextAlign.center,
                     ),
                     const SizedBox(height: 24),
@@ -79,17 +82,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           TextFormField(
                             controller: _emailController,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              prefixIcon: Icon(Icons.email),
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.email,
+                              prefixIcon: const Icon(Icons.email),
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.trim().isEmpty) {
-                                return 'Email is required';
+                                return l10n.emailRequired;
                               }
                               if (!value.contains('@')) {
-                                return 'Enter a valid email';
+                                return l10n.emailInvalid;
                               }
                               return null;
                             },
@@ -98,17 +101,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           TextFormField(
                             controller: _passwordController,
                             obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Password',
-                              prefixIcon: Icon(Icons.lock),
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.password,
+                              prefixIcon: const Icon(Icons.lock),
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Password is required';
+                                return l10n.passwordRequired;
                               }
                               if (value.length < 6) {
-                                return 'Password must be at least 6 characters';
+                                return l10n.passwordMinLength;
                               }
                               return null;
                             },
@@ -117,17 +120,17 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           TextFormField(
                             controller: _confirmController,
                             obscureText: true,
-                            decoration: const InputDecoration(
-                              labelText: 'Confirm password',
-                              prefixIcon: Icon(Icons.lock_outline),
-                              border: OutlineInputBorder(),
+                            decoration: InputDecoration(
+                              labelText: l10n.confirmPassword,
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              border: const OutlineInputBorder(),
                             ),
                             validator: (value) {
                               if (value == null || value.isEmpty) {
-                                return 'Confirm your password';
+                                return l10n.confirmPasswordRequired;
                               }
                               if (value != _passwordController.text) {
-                                return 'Passwords do not match';
+                                return l10n.passwordsDoNotMatch;
                               }
                               return null;
                             },
@@ -140,7 +143,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             ),
                             child: isLoading
                                 ? const CircularProgressIndicator()
-                                : const Text('Create account'),
+                                : Text(l10n.createAccount),
                           ),
                         ],
                       ),

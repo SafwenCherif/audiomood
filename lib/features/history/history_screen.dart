@@ -1,8 +1,10 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../core/locale/locale_provider.dart';
 import '../../core/network/network_provider.dart';
 import '../../core/network/network_service.dart';
+import '../../l10n/app_localizations.dart';
 import '../../widgets/history_card.dart';
 import '../../widgets/network_error_view.dart';
 import 'history_detail_screen.dart';
@@ -18,11 +20,14 @@ class HistoryScreen extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final l10n = AppLocalizations.of(context)!;
+    final locale = ref.watch(localeProvider);
     final user = FirebaseAuth.instance.currentUser;
+
     if (user == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Mood History')),
-        body: const Center(child: Text('Please sign in to view history.')),
+        appBar: AppBar(title: Text(l10n.moodHistory)),
+        body: Center(child: Text(l10n.signInToViewHistory)),
       );
     }
 
@@ -32,13 +37,13 @@ class HistoryScreen extends ConsumerWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Mood History'),
+        title: Text(l10n.moodHistory),
         backgroundColor: Colors.deepPurple,
         foregroundColor: Colors.white,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+            tooltip: l10n.refresh,
             onPressed: () => _retry(ref, user.uid),
           ),
         ],
@@ -47,15 +52,14 @@ class HistoryScreen extends ConsumerWidget {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (_, __) => NetworkErrorView(
           failureType: NetworkFailureType.unknown,
-          message: 'Could not check your connection. Please try again.',
+          message: l10n.connectionCheckFailed,
           onRetry: () => _retry(ref, user.uid),
         ),
         data: (isConnected) {
           if (!isConnected) {
             return NetworkErrorView(
               failureType: NetworkFailureType.offline,
-              message:
-                  'Mood history is stored online. Turn on Wi‑Fi or mobile data to load your past moods.',
+              message: l10n.historyOfflineMessage,
               onRetry: () => _retry(ref, user.uid),
             );
           }
@@ -63,7 +67,7 @@ class HistoryScreen extends ConsumerWidget {
           return historyAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
             error: (err, _) {
-              final networkError = NetworkService.from(err);
+              final networkError = NetworkService.from(err, locale: locale);
               return NetworkErrorView(
                 failureType: networkError.type,
                 message: networkError.message,
@@ -72,7 +76,7 @@ class HistoryScreen extends ConsumerWidget {
             },
             data: (items) {
               if (items.isEmpty) {
-                return const Center(child: Text('No history yet.'));
+                return Center(child: Text(l10n.noHistoryYet));
               }
               return ListView.separated(
                 padding: const EdgeInsets.all(16),
@@ -87,19 +91,17 @@ class HistoryScreen extends ConsumerWidget {
                       return await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
-                              title: const Text('Delete history?'),
-                              content: const Text(
-                                'This will permanently remove this mood record.',
-                              ),
+                              title: Text(l10n.deleteHistoryTitle),
+                              content: Text(l10n.deleteHistoryMessage),
                               actions: [
                                 TextButton(
                                   onPressed: () =>
                                       Navigator.pop(context, false),
-                                  child: const Text('Cancel'),
+                                  child: Text(l10n.cancel),
                                 ),
                                 ElevatedButton(
                                   onPressed: () => Navigator.pop(context, true),
-                                  child: const Text('Delete'),
+                                  child: Text(l10n.delete),
                                 ),
                               ],
                             ),
@@ -115,16 +117,19 @@ class HistoryScreen extends ConsumerWidget {
                     onDismissed: (_) async {
                       try {
                         final network = ref.read(networkServiceProvider);
-                        await network.ensureConnected();
+                        await network.ensureConnected(locale: locale);
                         await firestoreService.deleteHistory(user.uid, item.id);
                         if (context.mounted) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('History deleted.')),
+                            SnackBar(content: Text(l10n.historyDeleted)),
                           );
                         }
                       } catch (e) {
                         if (context.mounted) {
-                          final networkError = NetworkService.from(e);
+                          final networkError = NetworkService.from(
+                            e,
+                            locale: locale,
+                          );
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
                               content: Text(networkError.message),

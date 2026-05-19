@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:just_audio/just_audio.dart';
+import '../../l10n/app_localizations.dart';
 import '../../models/mood_history_model.dart';
 
 class HistoryDetailScreen extends StatefulWidget {
@@ -56,22 +57,23 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
     super.dispose();
   }
 
-  Future<bool> _handleBack() async {
-    await _stopAudio();
-    return true;
-  }
-
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final date = widget.history.createdAt.toDate();
     final formatted =
         '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
 
-    return WillPopScope(
-      onWillPop: _handleBack,
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        await _stopAudio();
+        if (mounted) Navigator.of(context).pop();
+      },
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Mood Details'),
+          title: Text(l10n.moodDetails),
           backgroundColor: Colors.deepPurple,
           foregroundColor: Colors.white,
           leading: IconButton(
@@ -111,12 +113,12 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                 ),
               ),
               const SizedBox(height: 4),
-              Text('Saved on $formatted'),
+              Text(l10n.savedOn(formatted)),
               const SizedBox(height: 24),
               if (_isLoading)
                 const Center(child: CircularProgressIndicator())
               else if (widget.history.previewUrl.isEmpty)
-                const Text('No preview audio available for this mood.')
+                Text(l10n.noPreviewForMood)
               else
                 ElevatedButton.icon(
                   onPressed: () async {
@@ -132,7 +134,7 @@ class _HistoryDetailScreenState extends State<HistoryDetailScreen> {
                   icon: Icon(
                     _isPlaying ? Icons.pause_circle : Icons.play_circle_fill,
                   ),
-                  label: Text(_isPlaying ? 'Pause' : 'Play preview'),
+                  label: Text(_isPlaying ? l10n.pause : l10n.playPreview),
                 ),
             ],
           ),

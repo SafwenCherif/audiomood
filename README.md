@@ -15,6 +15,7 @@
 - **Local persistence** — Last emotion, onboarding flag, preferred detection method
 - **Network layer** — Centralized connectivity checks, 15s API timeouts, user-friendly error messages
 - **Reusable widgets** — `TrackCard`, `HistoryCard`, `NetworkErrorView`
+- **Multilingual (i18n)** — English and French (`flutter gen-l10n` + ARB files)
 
 ## Tech stack
 
@@ -32,6 +33,7 @@
 | Local storage | `shared_preferences` |
 | Secrets | `flutter_dotenv` (`.env`) |
 | Audio | `just_audio` |
+| Localization | `flutter_localizations` + ARB (`en`, `fr`) |
 
 ## Architecture
 
@@ -57,6 +59,8 @@ lib/
 ├── firebase_options.dart              # Generated Firebase config
 │
 ├── core/
+│   ├── locale/
+│   │   └── locale_provider.dart       # App language (en/fr) + SharedPreferences
 │   ├── network/
 │   │   ├── network_service.dart       # Connectivity, timeouts, error mapping
 │   │   └── network_provider.dart      # networkServiceProvider, hasInternetProvider
@@ -89,10 +93,15 @@ lib/
 │       ├── history_screen.dart        # List with offline/error handling
 │       └── history_detail_screen.dart
 │
+├── l10n/
+│   ├── app_en.arb                     # English strings
+│   ├── app_fr.arb                     # French strings
+│   └── app_localizations.dart         # Generated (do not edit)
 └── widgets/
     ├── track_card.dart                # Deezer track row (cover, play/pause)
     ├── history_card.dart              # Mood history list item
-    └── network_error_view.dart        # Full-screen offline/timeout/error UI
+    ├── network_error_view.dart        # Full-screen offline/timeout/error UI
+    └── language_switcher.dart         # EN / FR selector
 ```
 
 ## Prerequisites
@@ -187,6 +196,7 @@ flutter run
 | **SharedPreferences** | `last_emotion` | Quick “Use last mood” shortcut |
 | | `onboarding_seen` | Skip intro on next launch |
 | | `emotion_method` | Remember Groq / TFLite / ML Kit choice |
+| | `app_locale` | `en` or `fr` — selected app language |
 | **`.env`** | API keys | Secrets kept out of source code |
 
 ## Network & error handling
@@ -243,6 +253,15 @@ Reusable full-screen widget showing:
 | **Firebase Auth** | SDK | Sign in, register, Google OAuth, sign out |
 | **Firestore** | SDK | `users/{userId}/mood_history` stream + CRUD |
 
+## Localization (English / French)
+
+- **ARB files:** `lib/l10n/app_en.arb`, `lib/l10n/app_fr.arb`
+- **Generated code:** run `flutter gen-l10n` after editing ARB files
+- **Usage in UI:** `AppLocalizations.of(context)!` → e.g. `l10n.signIn`
+- **Language switcher:** Login screen (compact) and Camera drawer (dropdown)
+- **Persistence:** `app_locale` in SharedPreferences via `localeProvider`
+- **Default:** French (`fr`), or device language if `en`/`fr`, otherwise `fr`
+
 ## Riverpod providers
 
 | Provider | Type | Role |
@@ -264,6 +283,7 @@ Reusable full-screen widget showing:
 | `emotionMethodProvider` | StateProvider | groq / tflite / mlkit selection (`emotion_provider.dart`) |
 | `selectedImagePathProvider` | StateProvider | Captured photo file path |
 | `isLoadingProvider` | StateProvider | Find Playlist loading state |
+| `localeProvider` | StateNotifierProvider | App locale (`en` / `fr`) |
 
 ## Navigation
 
