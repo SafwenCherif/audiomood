@@ -5,6 +5,7 @@ import '../music/playlist_screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'emotion_provider.dart';
 import 'groq_emotion_detector.dart';
 import '../music/music_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -17,16 +18,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../history/history_screen.dart';
 import '../../core/network/network_service.dart';
 import '../../core/network/network_provider.dart';
-
-enum EmotionDetectionMethod { groq, tflite, mlkit }
-
-final emotionMethodProvider = StateProvider<EmotionDetectionMethod>(
-  (ref) => EmotionDetectionMethod.groq,
-);
-
-// Riverpod provider to hold the file path (Best for Android)
-final selectedImagePathProvider = StateProvider<String?>((ref) => null);
-final isLoadingProvider = StateProvider<bool>((ref) => false);
 
 class CameraScreen extends StatefulWidget {
   const CameraScreen({super.key});

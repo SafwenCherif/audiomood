@@ -13,7 +13,7 @@ void main() async {
   // Initialize Firebase with the file you just generated
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  // ProviderScope is REQUIRED for Riverpod
+  
   runApp(const ProviderScope(child: AudioMoodApp()));
 }
 

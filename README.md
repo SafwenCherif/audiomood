@@ -76,7 +76,8 @@ lib/
 │   │   ├── register_screen.dart
 │   │   └── onboarding_screen.dart
 │   ├── emotion/
-│   │   ├── camera_screen.dart         # Main hub + camera-related providers
+│   │   ├── emotion_provider.dart      # Camera state providers
+│   │   ├── camera_screen.dart         # Main hub (camera + analysis UI)
 │   │   ├── groq_emotion_detector.dart # Cloud vision LLM (Groq)
 │   │   ├── tflite_emotion_detector.dart
 │   │   └── ml_kit_emotion_detection.dart
@@ -260,7 +261,7 @@ Reusable full-screen widget showing:
 | `audioPlayerProvider` | Provider | Shared `AudioPlayer` (auto-dispose) |
 | `currentlyPlayingProvider` | StateProvider | Preview URL of playing track |
 | `lastEmotionProvider` | FutureProvider | Last mood from SharedPreferences |
-| `emotionMethodProvider` | StateProvider | groq / tflite / mlkit selection |
+| `emotionMethodProvider` | StateProvider | groq / tflite / mlkit selection (`emotion_provider.dart`) |
 | `selectedImagePathProvider` | StateProvider | Captured photo file path |
 | `isLoadingProvider` | StateProvider | Find Playlist loading state |
 
